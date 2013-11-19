@@ -1,7 +1,7 @@
 Javadoc Help for Emacs
 ======================
 
-# About
+## About
 
 Javadoc-Help is an add-on module for Emacs that let you jump to a Javadoc page in the browser. 
 While editing in Emacs, you can place your cursor on a class name, hit a key (F1) to search 
@@ -13,7 +13,7 @@ in third party libraries, or in the current project.  Javadoc-Help allows you se
 javadocs quickly in Emacs, remote or local, and open up the found class in a browser.
 
 
-# Feature Overview
+## Feature Overview
 
 * Search Java class name in multiple javadocs
 * Support remote online javadoc (URL)
@@ -24,7 +24,7 @@ javadocs quickly in Emacs, remote or local, and open up the found class in a bro
 * Open a class, its package, or the main index javadoc
 
 
-# Installation:
+## Installation:
   
 Copy the javadoc-help.el file to your load-path directory.  It's usually at ~/elisp/.  It's set in your .emacs like this:
 
@@ -35,7 +35,7 @@ Next add the following to your .emacs startup file.
       (require 'javadoc-help)
 
 
-# Configuration
+## Configuration
   
 Assign the commands to some keys in your .emacs file.  Examples below assign a set of keys to the javadoc-help functions.
 
