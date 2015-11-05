@@ -39,12 +39,56 @@ Next add the following to your .emacs startup file.
   
 Assign the commands to some keys in your .emacs file.  Examples below assign a set of keys to the javadoc-help functions.
 
-    (global-set-key [(f1)]          'javadoc-lookup)  ; F1 to lookup
-    (global-set-key [(shift f1)]    'javadoc-help)    ; Shift-F1 to bring up menu
+    (global-set-key [(f1)]          'javadoc-lookup)  ; F1 to lookup term on the configured Javadocs.
+    (global-set-key [(meta f1)]     'javadoc-help)    ; Meta-F1 to bring up the Javadoc-help menu to set up Javadocs.
 
-Javadoc-help uses Emacs' function browse-url to launch the system web browser.
-Make sure it's working for your platform.  Try it out with, M-x browse-url.
-Usually browse-url defaults to the OS default browser.  Some the OS default browser
-might not be set up.  Use 'M-x customize-option' browse-url-browser-function
-to pick a specific browser, (like setting Firefox as the browser to use).
+Note that Javadoc-help uses browse-url to launch the system web browser.
+Make sure it's working in Emacs.  Try it out with M-x browse-url.  Usually
+browse-url is set to the OS default browser.  Some OS might not have default 
+browser set up.  Use 'M-x customize-option' browse-url-browser-function
+to pick a specific browser, like setting Firefox as the browser to use.
+
+## Javadoc-help Setup and Usage:
+
+Set up the javadocs by going to the Javadoc-help setup menu (Meta-F1).
+Add an online url-based javadoc using the 'u' command, or add a local
+file-based javadoc using the 'f' command.  The online javadoc url 
+should point to the main index directory of the javadoc, e.g. 
+http://commons.apache.org/proper/commons-lang/javadocs/api-release/.
+The local file javadoc path should point to the directory containing
+the allclasses-frame.html file, e.g. c:/jdk/docs/api/ or /opt/jsee/docs/api/.
+
+After adding the javadoc url, try the 'o' command key to open the main
+index page of the javadoc in the browser.
+
+To look up the javadoc for a class, invoke the javadoc-lookup (F1) command.
+Type in the name to look up.  The name near the cursor in the current buffer
+is automatically used as the initial input.  The search term can be a partial
+class name, a package name, or it can be a regex.  For example,
+    Connection
+    String
+    .*lang.*String
+    java.io
+
+The lookup might produce multiple matches.  The *Javadoc-Search-Result* 
+window offers a number of commands to launch the browser on the class,
+the package, or the main javadoc page.
+
+The search term history is accessable via the up/down arrows during input.
+
+If you prefer setting up the javadoc urls in your .emacs file, you can call
+javadoc-set-predefined-urls in .emacs to set up the pre-defined javadoc urls.
+e.g.
+    (javadoc-set-predefined-urls '("c:/jdk/docs/api" "/opt/jsee/docs/api"))
+
+Note that the allclasses-frame.html of online javadoc url is downloaded to
+~/.javadoc-cache for faster access.  If the online verison has changed, use
+the refresh command ('r') in the Javadoc-help setup menu to re-download the
+new version.
+
+## Uninstall and Cleanup:
+
+Besides the javadoc-help.el file, there are two places that have javadoc-help
+generated files.  1. ~/.javadoc-help is the configuration file.  2. ~/.javadoc-cache
+contains the downloaded allclasses-frame.html files from online javadocs.
 
