@@ -33,8 +33,8 @@ Copy the javadoc-help.el file to your load-path directory.  It's usually at ~/el
 Next add the following to your .emacs startup file.
 
     (require 'javadoc-help)
-  
-Assign the commands to some keys in your .emacs file.  Examples below assign a set of keys to the javadoc-help functions.
+
+Assign the commands to two keys in your .emacs file.  Example here assigns the two keys to the two user callable functions.
 
     (global-set-key [(f1)]          'javadoc-lookup)  ; F1 to lookup term on the configured Javadocs.
     (global-set-key [(meta f1)]     'javadoc-help)    ; meta-F1 to bring up the Javadoc-help menu to set up Javadocs.
