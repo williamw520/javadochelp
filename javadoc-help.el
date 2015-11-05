@@ -1,15 +1,15 @@
 ;;; javadoc-help.el --- Javadoc-Help.  Look up Java class on online javadocs in browser.
 ;;
-;; Copyright (C) 2008 William W. Wong
+;; Copyright (C) 2008-2015 William W. Wong
 ;;
-;; Author: William W. Wong <williamw520(AT)yahoo(DOT)com>
+;; Author: William W. Wong <williamw520@gmail.com>
 ;; Created: February, 2008
-;; Version: 1.0
+;; Version: 1.2
 ;; Keywords: javadoc, help, lookup, java
 
 ;; This file is not part of GNU Emacs.
 
-;;; License
+;;; License (GPL)
 ;;
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License version 2 as
@@ -54,43 +54,44 @@
 
 ;;; Configuration:
 ;;
-;;  Assign the commands to some keys in your .emacs file.
+;;  Assign the commands to two keys in your .emacs file.
 ;;
-;;  Examples below assign a set of keys to the javadoc-help functions.
-;;    (global-set-key [(f1)]          'javadoc-lookup)  ; F1 to lookup
-;;    (global-set-key [(shift f1)]    'javadoc-help)    ; Shift-F1 to bring up menu
+;;  Example here assigns the two keys to the two user callable functions.
+;;    (global-set-key [(f1)]          'javadoc-lookup)  ; F1 to lookup term on the configured Javadocs.
+;;    (global-set-key [(meta f1)]     'javadoc-help)    ; Meta-F1 to bring up the Javadoc-help menu to set up Javadocs.
 ;;
-;;  Javadoc-help uses browse-url to launch the system web browser.  Make sure
-;;  it's working for your platform.  Try it out with, M-x browse-url.  Usually
-;;  browse-url defaults to the OS default browser.  Some the OS default browser
-;;  might not be set up.  Use 'M-x customize-option' browse-url-browser-function
-;;  to pick a specific browser, (like setting Firefox as the browser to use).
+;;  Note that Javadoc-help uses browse-url to launch the system web browser.
+;;  Make sure it's working in Emacs.  Try it out with M-x browse-url.  Usually
+;;  browse-url is set to the OS default browser.  Some OS might not have default 
+;;  browser set up.  Use 'M-x customize-option' browse-url-browser-function
+;;  to pick a specific browser, like setting Firefox as the browser to use.
 ;;
 
-;;; Usage:
+;;; Javadoc-help Setup and Usage:
 ;;
-;;  Set up the javadocs by going to the Javadoc-help menu.  You can then add
-;;  a url-based javadoc or a local file-based javadoc using the 'u' or 'f'
-;;  command key.  The javadoc urls should be pointing to the main index 
-;;  directory of the javadoc, which containing the allclasses-frame.html file.
-;;  For example, http://commons.apache.org/lang/api-release/, /opt/jsee/docs/api/, or
-;;  c:/jdk/docs/api/.  The entered javadocs are saved persistently.
+;;  Set up the javadocs by going to the Javadoc-help setup menu (Meta-F1).
+;;  Add an online url-based javadoc using the 'u' command, or add a local
+;;  file-based javadoc using the 'f' command.  The online javadoc url 
+;;  should point to the main index directory of the javadoc, e.g. 
+;;  http://commons.apache.org/proper/commons-lang/javadocs/api-release/.
+;;  The local file javadoc path should point to the directory containing
+;;  the allclasses-frame.html file, e.g. c:/jdk/docs/api/ or /opt/jsee/docs/api/.
 ;;
 ;;  After adding the javadoc url, try the 'o' command key to open the main
-;;  index page of the javadoc in the browser.
+;   index page of the javadoc in the browser.
 ;;
 ;;  To look up the javadoc for a class, invoke the javadoc-lookup (F1) command.
-;;  Type in the class name to look up.  The name near the cursor in the current
-;;  buffer is automatically used as the initial input.  The search term can be
-;;  a partial class name, a package name, or it can be a regex.  For example,
+;;  Type in the name to look up.  The name near the cursor in the current buffer
+;;  is automatically used as the initial input.  The search term can be a partial
+;;  class name, a package name, or it can be a regex.  For example,
 ;;    Connection
 ;;    String
 ;;    .*lang.*String
 ;;    java.io
 ;;
 ;;  The lookup might produce multiple matches.  The *Javadoc-Search-Result* 
-;;  window offers a number of commands to view the class, the package, or the
-;;  main javadoc page.
+;;  window offers a number of commands to launch the browser on the class,
+;;  the package, or the main javadoc page.
 ;;
 ;;  The search term history is accessable via the up/down arrows during input.
 ;;
@@ -99,12 +100,25 @@
 ;;  e.g.
 ;;    (javadoc-set-predefined-urls '("c:/jdk/docs/api" "/opt/jsee/docs/api"))
 ;;
-
-;;; Acknowledgements:
+;;  Note that the allclasses-frame.html of online javadoc url is downloaded to
+;;  ~/.javadoc-cache for faster access.  If the online verison has changed, use
+;;  the refresh command ('r') in the Javadoc-help setup menu to re-download the
+;;  new version.
 ;;
+;;  Uninstall and Cleanup:
+;;
+;;  Besides the javadoc-help.el file, there are two places that have javadoc-help
+;;  generated files.  1. ~/.javadoc-help is the configuration file.  2. ~/.javadoc-cache
+;;  contains the downloaded allclasses-frame.html files from online javadocs.
 ;;
 
 ;;; History:
+;;
+;;  2015/11/04 William Wong
+;;      Applied file-truename on the local javadoc path to avoid incomplete path input (e.g. /jdk/docs/api => C:/jdk/docs/api)
+;;      Cleaned up Javadoc-help menu screen's command key display.
+;;      Cleanup usage document to match the command keys.
+;;      Version 1.2
 ;;
 ;;  2013/11/19 William Wong
 ;;      Migrated source control to Github.
@@ -123,12 +137,6 @@
 ;;  2008/02/09 William Wong
 ;;      Start project.
 ;;      Version 0.0
-;;
-
-;;;
-;;  Todo:
-;;
-;;
 ;;
 
 
@@ -181,7 +189,7 @@
         ; Present the multi-result to user, or launch single-result-url in browser.
         (setq single-result-url (jdh-select-result match-list))
         (when single-result-url
-          (message (format "Single matched item.  Launching web browser on %s" single-result-url))
+          (message (format "javadocl-help: launching web browser on %s" single-result-url))
           (browse-url single-result-url)))
         )
     )
@@ -526,14 +534,14 @@
         (erase-buffer)
         (insert (concat jdh--jmenu-buffer "\n\n"))
         (insert "Manage Javadoc URL.\n\n")
-        (insert "  u  - add an online javadoc url. e.g. http://commons.apache.org/lang/api/\n")
+        (insert "  u  - add an online javadoc url. e.g. http://commons.apache.org/proper/commons-lang/javadocs/api-release\n")
         (insert "  f  - add a local javadoc directory. e.g. c:/jdk/docs/api, or /opt/jdk/docs/api\n")
         (insert "  o  - launch the javadoc URL in the system web browser.\n")
         (insert "  r  - reload and refresh the javadoc url from the source.\n")
         (insert "  e  - enable/disable the javadoc url for searching.\n")
         (insert "  ^d - mark this javadoc entry for deletion.\n")
-        (insert "  D  - unmark the javadoc entry from deletion.\n")
-        (insert "  X  - delete the marked javadoc entries\n")
+        (insert "  d  - unmark the javadoc entry from deletion.\n")
+        (insert "  x  - delete the marked javadoc entries\n")
         (insert "  ?  - for help\n")
         (insert "\n")
         (insert "% Javadoc URL\n")
@@ -618,10 +626,10 @@
     )
   )
 
-(defun jdh-jmenu-add-directory ()
-  "Add Javadoc directory."
+(defun jdh-jmenu-add-local-directory ()
+  "Add local Javadoc directory."
   (interactive)
-  (let* ((directory-name (jdh-jmenu-input-directory))
+  (let* ((directory-name (file-truename (jdh-jmenu-input-directory)))
          allclasses-file)
     (when directory-name
       ;; and-check api file, add file record
@@ -714,7 +722,7 @@
       (let* ((base-url (jdh-javadoc-url javadoc))
              (main-url (jdh-normalize-url(concat-path base-url "index.html"))))
 ;       (jdh-close-buffer)
-        (message (format "Launching web browser on %s" main-url))
+        (message (format "javadocl-help: launching web browser on %s" main-url))
         (browse-url main-url))))
   )
 
@@ -769,13 +777,13 @@
   (setq *jdh-jmenu-mode-map* (make-keymap))
   (suppress-keymap *jdh-jmenu-mode-map* t)
   (define-key *jdh-jmenu-mode-map* "u"        'jdh-jmenu-add-url)
-  (define-key *jdh-jmenu-mode-map* "f"        'jdh-jmenu-add-directory)
+  (define-key *jdh-jmenu-mode-map* "f"        'jdh-jmenu-add-local-directory)
   (define-key *jdh-jmenu-mode-map* "o"        'jdh-jmenu-open-url)
   (define-key *jdh-jmenu-mode-map* "r"        'jdh-jmenu-refresh-javadoc)
   (define-key *jdh-jmenu-mode-map* "e"        'jdh-jmenu-enable-javadoc)
   (define-key *jdh-jmenu-mode-map* "\C-d"     'jdh-jmenu-mark-delete)
-  (define-key *jdh-jmenu-mode-map* "\S-d"     'jdh-jmenu-unmark-delete)
-  (define-key *jdh-jmenu-mode-map* "\S-x"     'jdh-jmenu-commit-deletions)
+  (define-key *jdh-jmenu-mode-map* "d"        'jdh-jmenu-unmark-delete)
+  (define-key *jdh-jmenu-mode-map* "x"        'jdh-jmenu-commit-deletions)
   (define-key *jdh-jmenu-mode-map* "n"        'next-line)
   (define-key *jdh-jmenu-mode-map* " "        'next-line)
   (define-key *jdh-jmenu-mode-map* "p"        'previous-line)
@@ -789,8 +797,8 @@
 The following commands are available.
 \\<*jdh-jmenu-mode-map*>
 \\[jdh-jmenu-add-url] -- add an online javadoc url. e.g. http://commons.apache.org/lang/api/
-\\[jdh-jmenu-add-directory] -- add a local javadoc directory. e.g. c:/jdk/docs/api, or /opt/jdk/docs/api
-\\[jdh-jmenu-open-url] -- launch the javadoc URL in the system web browser.
+\\[jdh-jmenu-add-local-directory] -- add a local javadoc directory. e.g. c:/jdk/docs/api, or /opt/jdk/docs/api
+\\[jdh-jmenu-open-url] -- launch the main page of javadoc URL in the web browser.
 \\[jdh-jmenu-refresh-javadoc] -- reload and refresh the javadoc url from the source.
 \\[jdh-jmenu-enable-javadoc] -- enable/disable the javadoc url for searching.
 \\[jdh-jmenu-mark-delete] -- mark this javadoc entry for deletion.
@@ -1149,7 +1157,7 @@ The following commands are available.
       (message (format "%d %d" (point) (match-end 0)))
     (message "none"))
   )
-
+  (file-truename "/jdk1.8")
 )
 
 ;;
