@@ -58,7 +58,7 @@
 ;;
 ;;  Example here assigns the two keys to the two user callable functions.
 ;;    (global-set-key [(f1)]          'javadoc-lookup)  ; F1 to lookup term on the configured Javadocs.
-;;    (global-set-key [(meta f1)]     'javadoc-help)    ; Meta-F1 to bring up the Javadoc-help menu to set up Javadocs.
+;;    (global-set-key [(meta f1)]     'javadoc-help)    ; meta-F1 to bring up the Javadoc-help menu to set up Javadocs.
 ;;
 ;;  Note that Javadoc-help uses browse-url to launch the system web browser.
 ;;  Make sure it's working in Emacs.  Try it out with M-x browse-url.  Usually
@@ -69,7 +69,7 @@
 
 ;;; Javadoc-help Setup and Usage:
 ;;
-;;  Set up the javadocs by going to the Javadoc-help setup menu (Meta-F1).
+;;  Set up the javadocs by going to the Javadoc-help setup menu (meta-F1).
 ;;  Add an online url-based javadoc using the 'u' command, or add a local
 ;;  file-based javadoc using the 'f' command.  The online javadoc url 
 ;;  should point to the main index directory of the javadoc, e.g. 
