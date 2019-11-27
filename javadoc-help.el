@@ -171,6 +171,13 @@
   :type 'string
   :group 'javadoc-help)
 
+(defcustom javadoc-help-default-jdk-javadoc "http://docs.oracle.com/javase/8/docs/api/"
+  "*The default URL to the online JDK Javadoc."
+  :type 'string
+  :group 'javadoc-help)
+
+
+
 
 ;;; User callable functions
 
@@ -616,15 +623,18 @@
 		 '*jdh-url-input-history*
 		 default-url)))
     (setq input-str (jdh-jmenu-parse-input input-str))
-    (if (not (and input-str
-                  (jdh-refresh-url input-str)))
-        (message (format "Failed to refresh %s" input-str))
-      (jdh-javadocs-add (jdh-javadoc-new input-str t t nil))
-      (jdh-javadocs-save)
-      (jdh-jmenu-redraw-at)
-      (message (format "Javadoc url %s added" input-str)))
-    )
+    (jdh-refresh-add-url input-str)
+    (jdh-jmenu-redraw-at)
+    (message (format "Javadoc url %s added" input-str)))
   )
+
+(defun jdh-refresh-add-url (url)
+  "Add Javadoc URL."
+    (if (not (and url (jdh-refresh-url url)))
+        (message (format "Failed to refresh %s" url))
+      (jdh-javadocs-add (jdh-javadoc-new url t t nil))
+      (jdh-javadocs-save))
+    )
 
 (defun jdh-jmenu-add-local-directory ()
   "Add local Javadoc directory."
@@ -1057,11 +1067,18 @@ The following commands are available.
   (jdh-javadocs-save)
   )
 
+(defun jdh-process-default-urls ()
+  (when (not *jdh-javadocs*)
+    (message (format "jdh-refresh-add-url " javadoc-help-default-jdk-javadoc));
+    (jdh-refresh-add-url javadoc-help-default-jdk-javadoc)
+    ))
+
 ;; Load from setting file on start up.
 (add-hook' after-init-hook
            (lambda ()
              (jdh-javadocs-restore)
              (jdh-process-predefined-urls *jdh-predefined-urls*)
+             (jdh-process-default-urls)
              ))
 
 ;; Save to setting file on exit.
@@ -1158,6 +1175,8 @@ The following commands are available.
     (message "none"))
   )
   (file-truename "/jdk1.8")
+  *jdh-javadocs*
+  (jdh-process-default-urls)
 )
 
 ;;
